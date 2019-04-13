@@ -45,15 +45,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  void _saveAddress() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+      //myController.text = t;
     });
+  }
+  final myController = TextEditingController();
+  void dispose() {
+    // Clean up the controller when the Widget is disposed
+    myController.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text(widget.title),
+        title: new Text('Kevin is dumb'),
       ),
       body: new Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -90,19 +96,41 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new Text(
-              'You have pushed the button this many times:',
-            ),
-            new Text(
-              '$_counter',
+              myController.text,
               style: Theme.of(context).textTheme.display1,
             ),
-          ],
+            new TextFormField(
+              controller: myController,
+              decoration: new InputDecoration(
+                labelText: "Enter Address",
+                fillColor: Colors.blue,
+                border: new OutlineInputBorder(
+                  borderRadius: new BorderRadius.circular(25.0),
+                  borderSide: new BorderSide(
+                  ),
+                ),
+                //fillColor: Colors.black,
+              ),
+              validator: (val) {
+//                if(val.length==0) {
+//                  return "Email cannot be empty";
+//                }else{
+//                  return null;
+//                }
+              },
+              keyboardType: TextInputType.emailAddress,
+              style: new TextStyle(
+                fontFamily: "Poppins",
+                color: Colors.black,
+              ),
+            ),
+
+        ],
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
+        onPressed: _saveAddress,
+        child: new Icon(Icons.text_fields),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
