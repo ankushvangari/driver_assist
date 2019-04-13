@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'dart:math';
+import 'package:vector_math/vector_math.dart' as v;
 
 void main() => runApp(new MyApp());
 
@@ -45,8 +47,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Position pos;
-  double lat = 0, lon = 0;
-
+  double lat = 0, lon = 0, lat2 = 0, lon2 = 0;
+  Random rnd = new Random();
+  double R = 6378.1, brng = 1.57, d; //Radius of the Earth
   void initState() {
     super.initState();
     initPlatformState();
@@ -54,6 +57,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   initPlatformState() async {
     pos = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+
   }
 
 
@@ -65,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       //myController.text = t;
+      brng = rnd.nextDouble()*6.2831853;// #Bearing is 90 degrees converted to radians.
     });
   }
   final myController = TextEditingController();
@@ -79,6 +85,19 @@ class _MyHomePageState extends State<MyHomePage> {
     if (pos != null) {
       lat = pos.latitude;
       lon = pos.longitude;
+      d = 8; //#Distance in km
+
+      double lat1 = v.radians(lat);// #Current lat point converted to radians
+      double lon1 = v.radians(lon);// #Current long point converted to radians
+
+      lat2 = asin( sin(lat1)*cos(d/R) +
+          cos(lat1)*sin(d/R)*(brng));
+
+      lon2 = lon1 + atan2(sin(brng)*sin(d/R)*cos(lat1),
+          cos(d/R)-sin(lat1)*sin(lat2));
+
+      lat2 = v.degrees(lat2);
+      lon2 = v.degrees(lon2);
     }
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
@@ -113,6 +132,10 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             new Text(
               lat.toString() + ', ' + lon.toString(),
+              style: Theme.of(context).textTheme.display1,
+            ),
+            new Text(
+              lat2.toStringAsFixed(7) + ', ' + lon2.toStringAsFixed(7),
               style: Theme.of(context).textTheme.display1,
             ),
             new TextFormField(
