@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() => runApp(new MyApp());
 
@@ -43,7 +44,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  Position pos;
+  double lat = 0, lon = 0;
+
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  initPlatformState() async {
+    pos = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+
 
   void _saveAddress() {
     setState(() {
@@ -64,6 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (pos != null) {
+      lat = pos.latitude;
+      lon = pos.longitude;
+    }
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -96,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new Text(
-              myController.text,
+              lat.toString() + ', ' + lon.toString(),
               style: Theme.of(context).textTheme.display1,
             ),
             new TextFormField(
@@ -125,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
 
-        ],
+          ],
         ),
       ),
       floatingActionButton: new FloatingActionButton(
