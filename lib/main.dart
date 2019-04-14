@@ -109,12 +109,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Position pos;
-  double lat = 0, lon = 0, lat2 = 0, lon2 = 0;
+  double lat = 0, lon = 0, lat2 = 0, lon2 = 0, lat3 = 0, lon3 = 0;
   Random rnd = new Random();
   double R = 6378.1, brng = 1.57, d; //Radius of the Earth
   String val = "Choose one", transportation;
   double miles;
-  Color walkColor = Colors.blue, bikeColor = Colors.blue;
+  Color walkColor = Colors.black, bikeColor = Colors.black;
 
   final List<String> _dropdownValues = [
     "Walking",
@@ -144,13 +144,31 @@ class _MyHomePageState extends State<MyHomePage> {
     transportation = indicator;
     setState(() {
       if (indicator == 'walking') {
-        walkColor = Theme.of(context).primaryColorDark;
-        bikeColor = Theme.of(context).primaryColorLight;
+        walkColor = Colors.black;
+        bikeColor = Colors.grey;
       } else if (indicator == 'bicycling') {
-        walkColor = Theme.of(context).primaryColorLight;
-        bikeColor = Theme.of(context).primaryColorDark;
+        walkColor = Colors.grey;
+        bikeColor = Colors.black;
       }
     });
+  }
+
+  double angleFromCoordinate(double lat1, double long1, double lat2,
+      double long2) {
+
+    double dLon = (long2 - long1);
+
+    double y = sin(dLon) * cos(lat2);
+    double x = cos(lat1) * sin(lat2) - sin(lat1)
+        * cos(lat2) * cos(dLon);
+
+    double brng = atan2(y, x);
+
+    brng = v.degrees(brng);
+    brng = (brng + 360) % 360;
+    brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
+
+    return brng;
   }
 
   void getNewCoords(double value) {
@@ -158,8 +176,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (pos != null) {
         lat = pos.latitude;
         lon = pos.longitude;
-        d = value*3/8; //#Distance in km
-        brng = rnd.nextDouble()*6.2831;
+        d = value*1.60934/3; //#Distance in km
+        brng = v.radians(75);
         double lat1 = v.radians(lat);// #Current lat point converted to radians
         double lon1 = v.radians(lon);// #Current long point converted to radians
 
@@ -169,8 +187,17 @@ class _MyHomePageState extends State<MyHomePage> {
         lon2 = lon1 + atan2(sin(brng)*sin(d/R)*cos(lat1),
             cos(d/R)-sin(lat1)*sin(lat2));
 
+        brng = -v.radians(225);
+        lat3 = asin( sin(lat2)*cos(d/R) +
+            cos(lat2)*sin(d/R)*(brng));
+
+        lon3 = lon2 + atan2(sin(brng)*sin(d/R)*cos(lat2),
+            cos(d/R)-sin(lat2)*sin(lat3));
+
         lat2 = v.degrees(lat2);
         lon2 = v.degrees(lon2);
+        lat3 = v.degrees(lat3);
+        lon3 = v.degrees(lon3);
       }
     });
 
@@ -215,23 +242,14 @@ class _MyHomePageState extends State<MyHomePage> {
         title: new Text('Kevin is dumb'),
       ),
       body:new Container(
-//        decoration: BoxDecoration(
-//          // Box decoration takes a gradient
-//          gradient: LinearGradient(
-//            // Where the linear gradient begins and ends
-//            begin: Alignment.topRight,
-//            end: Alignment.bottomLeft,
-//            // Add one stop for each color. Stops should increase from 0 to 1
-//            stops: [0.1, 0.5, 0.7, 0.9],
-//            colors: [
-//              // Colors are easy thanks to Flutter's Colors class.
-//              Colors.blue[600],
-//              Colors.blue[500],
-//              Colors.blue[400],
-//              Colors.blue[300],
-//            ],
-//          ),
-//        ),
+      decoration: new BoxDecoration(
+      gradient: new LinearGradient(colors: [const Color(0xFF915FB5),const Color(0xFFCA436B)],
+      begin: FractionalOffset.topLeft,
+      end: FractionalOffset.bottomRight,
+      stops: [0.0,1.0],
+      tileMode: TileMode.clamp
+      ),
+      ),
 
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -252,53 +270,64 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           //mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Row(
+            new Container(
+              margin: const EdgeInsets.all(100.0),
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[ new Expanded(
                 child: new IconButton(
+                  iconSize: 50.0,
                     color: walkColor,
                     icon: new Icon(Icons.directions_walk),
                     tooltip: 'walking',
                     onPressed: () => _toggleColor('walking'))),
             new Expanded(
                 child: new IconButton(
+                  iconSize: 50.0,
                     color: bikeColor,
                     icon: new Icon(Icons.directions_bike),
                     tooltip: 'driving',
-                    onPressed: () => _toggleColor('bicycling'))),]),
-            new Text(
-              lat.toString() + ', ' + lon.toString(),
-              style: Theme.of(context).textTheme.display1,
+                    onPressed: () => _toggleColor('bicycling'))),
+            ]),
+
             ),
-            new Text(
-              lat2.toStringAsFixed(7) + ', ' + lon2.toStringAsFixed(7),
-              style: Theme.of(context).textTheme.display1,
-            ),
+//            new Text(
+//              lat.toString() + ', ' + lon.toString(),
+//              style: Theme.of(context).textTheme.display1,
+//            ),
+//            new Text(
+//              lat2.toStringAsFixed(7) + ', ' + lon2.toStringAsFixed(7),
+//              style: Theme.of(context).textTheme.display1,
+//            ),
             new Text(
               'How many miles would you like to run?',
-              style: Theme.of(context).textTheme.display1,
+
+              style: TextStyle(color: Colors.white) ,
+              textScaleFactor: 1.5,
             ),
-            new Container(
-              width: 200.0,
-              child: TextFormField(
-              controller: myController,
-              decoration: new InputDecoration(
-                labelText: "Enter # of miles",
-                fillColor: Colors.blue,
-                border: new OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(25.0),
+            Container(
+              margin: EdgeInsets.all(15.0),
+            child: Theme(
+              data: new ThemeData(
+                primaryColor: Colors.white,
+                primaryColorDark: Colors.white,
+              ),
+              child: new TextField(
+                keyboardType: TextInputType.number,
+                style: new TextStyle(
+                  fontFamily: "Poppins",
+                  color: Colors.white,
                 ),
-                //fillColor: Colors.black,
+                onChanged: (value) => getNewCoords(double.parse(value)),
+                autofocus: true,
+                cursorColor: Colors.white,
+                controller: myController,
+                decoration: new InputDecoration(
+                    border: new OutlineInputBorder(
+                        borderSide: new BorderSide(color: Colors.teal),
+                        borderRadius: new BorderRadius.circular(25.0),),),
               ),
-              onFieldSubmitted: (val) {
-                getNewCoords(double.parse(val));
-              },
-              keyboardType: TextInputType.number,
-              style: new TextStyle(
-                fontFamily: "Poppins",
-                color: Colors.black,
-              ),
-            ),
-            ),
+            ),),
             RaisedButton.icon(
 
               /// Documentation :
@@ -309,7 +338,9 @@ class _MyHomePageState extends State<MyHomePage> {
               /// z is the zoom level (1-21) , q is the search query
               /// t is the map type ("m" map, "k" satellite, "h" hybrid, "p" terrain, "e" GoogleEarth)
 
-              onPressed: () => _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat2},${lon2}&key=&travelmode=${transportation}"),
+              onPressed: () {
+                _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat},${lon}&waypoints=${lat2},${lon2}|${lat3},${lon3}&key=&travelmode=${transportation}");
+              },
               icon: Icon(Icons.location_on),
               label: Text("Open Maps"),
             ),
