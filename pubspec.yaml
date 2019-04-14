@@ -2,6 +2,10 @@ name: driver_assist
 description: A new Flutter application.
 
 dependencies:
+  google_maps_flutter: "^0.5.7"
+  url_launcher: ^5.0.2
+  intro_views_flutter:
+    git: git://github.com/aagarwal1012/IntroViews-Flutter
   geolocator: ^2.1.1
   permission_handler: "2.1.2"
   google_api_availability: "1.0.4"
@@ -22,7 +26,15 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  assets:
+    - assets/air-hostess.png
+    - assets/waiter.png
+    - assets/walking.png
+    - assets/cycling.png
+    - assets/bus-driver.png
+    - assets/hotel.png
+    - assets/running.png
+    - assets/taxi-driver.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
