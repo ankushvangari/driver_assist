@@ -1,6 +1,6 @@
-# driver_assist
+# Pandora's Path
 
-A new Flutter application.
+A mobile application that allows all walkers/runners and bikers to find a new path every trip!
 
 ## Getting Started
 
