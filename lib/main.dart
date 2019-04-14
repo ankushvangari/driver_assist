@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         // \iconImageAssetPath: 'assets/air-hostess.png',
         bubble: Image.asset('assets/air-hostess.png'),
         body: Text(
-          'Easily find a fun and random walking route to take!',
+          'Trying to go for a relaxing walk? We can find you one in no time!',
         ),
         title: Text(
           'Walking',
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       pageColor: const Color(0xFF8BC34A),
       iconImageAssetPath: 'assets/waiter.png',
       body: Text(
-        'Want to run? Let\'s find a route for you!',
+        'Do you love to run? Let\'s find a route for you!',
       ),
       title: Text('Running'),
       mainImage: Image.asset(
@@ -176,23 +176,24 @@ class _MyHomePageState extends State<MyHomePage> {
       if (pos != null) {
         lat = pos.latitude;
         lon = pos.longitude;
-        d = value*1.60934/3; //#Distance in km
-        brng = v.radians(75);
-        double lat1 = v.radians(lat);// #Current lat point converted to radians
-        double lon1 = v.radians(lon);// #Current long point converted to radians
+        d = value*1.60934 / 6371.0;
+        d /= 3;
+        brng = v.radians(rnd.nextInt(360).toDouble());
+        double lat1 = v.radians(lat);
+        double lon1 = v.radians(lon);
 
-        lat2 = asin( sin(lat1)*cos(d/R) +
-            cos(lat1)*sin(d/R)*(brng));
+        lat2 = asin( sin(lat1)*cos(d) + cos(lat1)*sin(d)*cos(brng) );
+        double a = atan2(sin(brng)*sin(d)*cos(lat1), cos(d)-sin(lat1)*sin(lat2));
+        lon2 = lon1 + a;
+        lon2 = (lon2+ 3*pi) % (2*pi) - pi;
 
-        lon2 = lon1 + atan2(sin(brng)*sin(d/R)*cos(lat1),
-            cos(d/R)-sin(lat1)*sin(lat2));
+        brng -= v.radians(60);// v.radians(30);
+        lat3 = asin( sin(lat2)*cos(d) + cos(lat2)*sin(d)*cos(brng) );
+        a = atan2(sin(brng)*sin(d)*cos(lat2), cos(d)-sin(lat2)*sin(lat3));
+        lon3 = lon2 + a;
 
-        brng = -v.radians(225);
-        lat3 = asin( sin(lat2)*cos(d/R) +
-            cos(lat2)*sin(d/R)*(brng));
+        lon3 = (lon3+ 3*pi) % (2*pi) - pi;
 
-        lon3 = lon2 + atan2(sin(brng)*sin(d/R)*cos(lat2),
-            cos(d/R)-sin(lat2)*sin(lat3));
 
         lat2 = v.degrees(lat2);
         lon2 = v.degrees(lon2);
@@ -239,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text('Kevin is dumb'),
+        title: new Text('Pandora\'s Route'),
       ),
       body:new Container(
       decoration: new BoxDecoration(
@@ -307,7 +308,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Container(
               margin: EdgeInsets.all(15.0),
-            child: Theme(
+            child: Container(
+              width: 200.0,
+              child: Theme(
               data: new ThemeData(
                 primaryColor: Colors.white,
                 primaryColorDark: Colors.white,
@@ -318,6 +321,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontFamily: "Poppins",
                   color: Colors.white,
                 ),
+                textAlign: TextAlign.center,
                 onChanged: (value) => getNewCoords(double.parse(value)),
                 autofocus: true,
                 cursorColor: Colors.white,
@@ -327,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderSide: new BorderSide(color: Colors.teal),
                         borderRadius: new BorderRadius.circular(25.0),),),
               ),
-            ),),
+            ),),),
             RaisedButton.icon(
 
               /// Documentation :
@@ -339,7 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
               /// t is the map type ("m" map, "k" satellite, "h" hybrid, "p" terrain, "e" GoogleEarth)
 
               onPressed: () {
-                _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat},${lon}&waypoints=${lat2},${lon2}|${lat3},${lon3}&key=&travelmode=${transportation}");
+                _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat},${lon}&waypoints=${lat2},${lon2}|${lat3},${lon3}&key=AIzaSyAMuvUu1DLYyrQE1u5Y9xV5mZ_zTgzyrGw&travelmode=${transportation}");
               },
               icon: Icon(Icons.location_on),
               label: Text("Open Maps"),
