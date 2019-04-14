@@ -114,6 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double R = 6378.1, brng = 1.57, d; //Radius of the Earth
   String val = "Choose one", transportation;
   double miles;
+  Color walkColor = Colors.blue, bikeColor = Colors.blue;
+
   final List<String> _dropdownValues = [
     "Walking",
     "Running",
@@ -137,6 +139,18 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+  void _toggleColor(String indicator) {
+    transportation = indicator;
+    setState(() {
+      if (indicator == 'walking') {
+        walkColor = Theme.of(context).primaryColorDark;
+        bikeColor = Theme.of(context).primaryColorLight;
+      } else if (indicator == 'bicycling') {
+        walkColor = Theme.of(context).primaryColorLight;
+        bikeColor = Theme.of(context).primaryColorDark;
+      }
+    });
   }
 
   void getNewCoords(double value) {
@@ -238,45 +252,19 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           //mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: 300.0,
-              child: GoogleMap(
-                mapType: MapType.terrain,
-                initialCameraPosition: _kGooglePlex,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ),
-            ),
-            new Container(
-              child: Container(
-                color: Colors.black54,
-                width: 200.0,
-                child: DropdownButton(
-              items: _dropdownValues
-                  .map((value) => DropdownMenuItem(
-                child: Text(value, textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
-                value: value,
-              ))
-                  .toList(),
-
-              onChanged: (String value) {setState((){val = value;});},
-              isExpanded: false,
-              hint: Text(val, textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
-            ),),
-            ),
-            new Expanded(
+            new Row(
+            children: <Widget>[ new Expanded(
                 child: new IconButton(
-                    color: Colors.blue,
+                    color: walkColor,
                     icon: new Icon(Icons.directions_walk),
                     tooltip: 'walking',
-                    onPressed: () => { transportation = 'walking'})),
+                    onPressed: () => _toggleColor('walking'))),
             new Expanded(
                 child: new IconButton(
-                    color: Colors.blue,
+                    color: bikeColor,
                     icon: new Icon(Icons.directions_bike),
                     tooltip: 'driving',
-                    onPressed: () => {transportation = 'driving'})),
+                    onPressed: () => _toggleColor('bicycling'))),]),
             new Text(
               lat.toString() + ', ' + lon.toString(),
               style: Theme.of(context).textTheme.display1,
@@ -321,7 +309,7 @@ class _MyHomePageState extends State<MyHomePage> {
               /// z is the zoom level (1-21) , q is the search query
               /// t is the map type ("m" map, "k" satellite, "h" hybrid, "p" terrain, "e" GoogleEarth)
 
-              onPressed: () => _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat2},${lon2}&key=&mode=${transportation}"),
+              onPressed: () => _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat2},${lon2}&key=&travelmode=${transportation}"),
               icon: Icon(Icons.location_on),
               label: Text("Open Maps"),
             ),
