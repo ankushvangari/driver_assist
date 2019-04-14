@@ -343,7 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
               /// t is the map type ("m" map, "k" satellite, "h" hybrid, "p" terrain, "e" GoogleEarth)
 
               onPressed: () {
-                _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat},${lon}&waypoints=${lat2},${lon2}|${lat3},${lon3}&key=AIzaSyAMuvUu1DLYyrQE1u5Y9xV5mZ_zTgzyrGw&travelmode=${transportation}");
+                _launchURL("https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${lat},${lon}&waypoints=${lat2},${lon2}|${lat3},${lon3}&key=&travelmode=${transportation}");
               },
               icon: Icon(Icons.location_on),
               label: Text("Open Maps"),
